@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+:root {
+  --background: #eef2f8;
+  --foreground: #0b1f3a;
+
+  /* anb-style navy/blue/gold palette (placeholder — swap for exact brand hex codes) */
+  --anb-navy: #0a2f5c;
+  --anb-navy-deep: #06213f;
+  --anb-navy-dark: #041427;
+  --anb-blue: #0f5fa8;
+  --anb-blue-bright: #1b7fd1;
+  --anb-blue-light: #5aa8e6;
+  --anb-blue-pale: #eaf3fc;
+  --anb-white: #ffffff;
+  --anb-gold: #c9a24d;
+  --anb-gold-soft: #e7d5a2;
+  --anb-ink: #0b1f3a;
+  --anb-line: #dfe6f0;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-anb-navy: var(--anb-navy);
+  --color-anb-navy-deep: var(--anb-navy-deep);
+  --color-anb-navy-dark: var(--anb-navy-dark);
+  --color-anb-blue: var(--anb-blue);
+  --color-anb-blue-bright: var(--anb-blue-bright);
+  --color-anb-blue-light: var(--anb-blue-light);
+  --color-anb-blue-pale: var(--anb-blue-pale);
+  --color-anb-white: var(--anb-white);
+  --color-anb-gold: var(--anb-gold);
+  --color-anb-gold-soft: var(--anb-gold-soft);
+  --color-anb-ink: var(--anb-ink);
+  --color-anb-line: var(--anb-line);
+  --font-sans: var(--font-tajawal);
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 15% -10%, rgba(15, 95, 168, 0.10), transparent 60%),
+    radial-gradient(900px 500px at 110% 10%, rgba(201, 162, 77, 0.08), transparent 55%),
+    var(--background);
+  color: var(--foreground);
+  font-family: var(--font-tajawal), Arial, Helvetica, sans-serif;
+}
+
+.anb-card {
+  background: var(--anb-white);
+  border: 1px solid var(--anb-line);
+  border-radius: 1rem;
+  box-shadow:
+    0 1px 2px rgba(11, 31, 58, 0.04),
+    0 12px 32px -12px rgba(10, 47, 92, 0.18);
+}
+
+.anb-gold-rule {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--anb-gold) 15%,
+    var(--anb-gold-soft) 50%,
+    var(--anb-gold) 85%,
+    transparent
+  );
+}
+
+.anb-navy-surface {
+  background: linear-gradient(160deg, var(--anb-navy) 0%, var(--anb-navy-deep) 55%, var(--anb-navy-dark) 100%);
+}
+
+.anb-field {
+  border: 1px solid var(--anb-line);
+  background: var(--anb-white);
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+
+.anb-field:focus {
+  outline: none;
+  border-color: var(--anb-blue-bright);
+  box-shadow: 0 0 0 3px rgba(27, 127, 209, 0.15);
+}
+
+.anb-btn-primary {
+  background: linear-gradient(135deg, var(--anb-blue-bright) 0%, var(--anb-blue) 60%, var(--anb-navy) 130%);
+  box-shadow: 0 8px 20px -8px rgba(15, 95, 168, 0.55);
+  transition: transform 150ms ease, box-shadow 150ms ease, filter 150ms ease;
+}
+
+.anb-btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px -10px rgba(15, 95, 168, 0.6);
+  filter: brightness(1.04);
+}
+
+.anb-btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
