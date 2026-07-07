@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifySessionToken, SESSION_COOKIE } from "@/lib/auth";
-import { SYSTEM_PROMPT, buildUserMessage, DraftFormInput } from "@/lib/prompt";
+import { SYSTEM_PROMPT, buildChatUserMessage } from "@/lib/prompt";
 import { generateDraft, GenerationError } from "@/lib/anthropic";
 import { appendLogRow } from "@/lib/sheets";
-import { findCategory, findMechanic } from "@/lib/categories";
 
 export async function POST(request: NextRequest) {
   const cookieStore = await cookies();
@@ -13,12 +12,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "غير مصرح" }, { status: 401 });
   }
 
-  const body = (await request.json().catch(() => null)) as DraftFormInput | null;
-  if (!body || !body.category || !body.mechanic) {
-    return NextResponse.json({ error: "بيانات النموذج غير مكتملة" }, { status: 400 });
+  const body = (await request.json().catch(() => null)) as { topic?: string } | null;
+  const topic = body?.topic?.trim();
+  if (!topic) {
+    return NextResponse.json({ error: "الرجاء كتابة الموضوع أولًا" }, { status: 400 });
   }
 
-  const userMessage = buildUserMessage(body);
+  const userMessage = buildChatUserMessage(topic);
 
   let draft: string;
   try {
@@ -33,11 +33,11 @@ export async function POST(request: NextRequest) {
   await appendLogRow({
     timestamp: new Date().toISOString(),
     username: session.username,
-    category: findCategory(body.category)?.label ?? body.category,
-    partner: body.partner || "",
-    mechanic: findMechanic(body.mechanic)?.label ?? body.mechanic,
-    detail: body.detail || "",
-    link: body.link || "",
+    category: "محادثة حرة",
+    partner: "",
+    mechanic: "",
+    detail: topic,
+    link: "",
     draft,
   });
 

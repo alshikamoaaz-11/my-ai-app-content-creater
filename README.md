@@ -1,8 +1,8 @@
 # anb Content Drafting Dashboard
 
 Internal tool for anb's marketing team (3 named users) to generate on-brand
-Arabic X/Twitter post drafts using Claude, from a structured form — no open
-chat input, no auto-posting.
+Arabic X/Twitter post drafts using Claude — either via a structured form or
+free-text chat — with no auto-posting anywhere.
 
 ## Stack
 
@@ -76,12 +76,28 @@ automatically.
 3. Deploy. No other configuration is needed — auth, generation, and logging
    all run as Next.js Route Handlers.
 
+## Voice grounding
+
+`src/lib/voiceExamples.ts` holds a curated set of real, high-engagement anb
+posts (extracted from a ~2,000-post export, links redacted to `[LINK]`),
+grouped by category. `lib/prompt.ts` injects a few of these into every
+generation call so drafts match anb's actual published tone rather than a
+hand-written approximation of it. To refresh this set from a new export,
+re-run the categorize/curate pass and update the arrays in that file.
+
+## Two creation modes
+
+- **Structured form** — category/partner/mechanic/detail/link fields.
+- **Free chat** — a single free-text box; the model infers the closest
+  template itself.
+
+Both modes share the same system prompt and guardrails: the model refuses to
+draft financial announcements, regulatory disclosures, official fraud
+warnings, or partnership/event news, asking the user to write those manually
+instead.
+
 ## What this app deliberately does not do
 
 - No public sign-up — only the 3 hardcoded logins work.
 - No auto-posting or auto-sending anywhere; drafts are copy-only.
 - No WhatsApp/Hootsuite integration.
-- No open-ended chat input — the form stays structured, and the system
-  prompt refuses to draft financial announcements, regulatory disclosures,
-  fraud warnings, or partnership/event news (it asks the user to write those
-  manually instead).

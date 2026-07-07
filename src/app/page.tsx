@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { verifySessionToken, SESSION_COOKIE } from "@/lib/auth";
-import DraftForm from "@/components/DraftForm";
+import CreationWorkspace from "@/components/CreationWorkspace";
 import LogoutButton from "@/components/LogoutButton";
 
 export default async function Home() {
@@ -45,11 +45,11 @@ export default async function Home() {
             ماذا تودّ أن تنشئ اليوم؟
           </h2>
           <p className="mt-1.5 text-sm text-slate-500">
-            اختر الفئة وأدخل التفاصيل، وسيقوم المساعد بصياغة مسودة تغريدة
-            جاهزة للمراجعة والنسخ.
+            اختر النموذج المنظم أو اكتب موضوعك مباشرة، وسيقوم المساعد بصياغة
+            مسودة تغريدة جاهزة للمراجعة والنسخ.
           </p>
         </div>
-        <DraftForm />
+        <CreationWorkspace />
       </main>
 
       <footer className="border-t border-anb-line py-5 text-center text-xs text-slate-400">
