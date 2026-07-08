@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { verifySessionToken, SESSION_COOKIE } from "@/lib/auth";
 import { SYSTEM_PROMPT, buildChatUserMessage } from "@/lib/prompt";
 import { generateDraft, GenerationError } from "@/lib/anthropic";
+import { enforceHashtagsAboveLink } from "@/lib/format";
 import { appendLogRow } from "@/lib/sheets";
 
 export async function POST(request: NextRequest) {
@@ -29,6 +30,8 @@ export async function POST(request: NextRequest) {
     }
     throw err;
   }
+
+  draft = enforceHashtagsAboveLink(draft);
 
   await appendLogRow({
     timestamp: new Date().toISOString(),

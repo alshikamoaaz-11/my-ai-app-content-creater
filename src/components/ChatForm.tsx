@@ -1,42 +1,16 @@
 "use client";
 
 import { useState } from "react";
-
-type Status = "idle" | "loading" | "success" | "error";
+import { useWorkspace } from "@/components/WorkspaceProvider";
 
 export default function ChatForm() {
-  const [topic, setTopic] = useState("");
-  const [draft, setDraft] = useState("");
-  const [status, setStatus] = useState<Status>("idle");
-  const [error, setError] = useState<string | null>(null);
+  const { topic, setTopic, draft, status, error, generateChat } = useWorkspace();
   const [copied, setCopied] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setStatus("loading");
-    setError(null);
     setCopied(false);
-
-    try {
-      const res = await fetch("/api/generate-chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic }),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        setStatus("error");
-        setError(data.error || "حدث خطأ أثناء إنشاء المسودة");
-        return;
-      }
-
-      setDraft(data.draft);
-      setStatus("success");
-    } catch {
-      setStatus("error");
-      setError("تعذّر الاتصال بالخادم، حاول مرة أخرى");
-    }
+    await generateChat();
   }
 
   async function handleCopy() {

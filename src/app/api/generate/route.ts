@@ -5,6 +5,8 @@ import { SYSTEM_PROMPT, buildUserMessage, DraftFormInput } from "@/lib/prompt";
 import { generateDraft, GenerationError } from "@/lib/anthropic";
 import { appendLogRow } from "@/lib/sheets";
 import { findCategory, findMechanic } from "@/lib/categories";
+import { scrapeUrl } from "@/lib/scrape";
+import { enforceHashtagsAboveLink } from "@/lib/format";
 
 export async function POST(request: NextRequest) {
   const cookieStore = await cookies();
@@ -18,7 +20,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "بيانات النموذج غير مكتملة" }, { status: 400 });
   }
 
-  const userMessage = buildUserMessage(body);
+  // Scrape the link once, server-side: markdown grounds the model, and the
+  // metadata is returned so the client renders the preview without re-fetching.
+  const scraped = body.link?.trim() ? await scrapeUrl(body.link) : null;
+  const preview = scraped
+    ? {
+        url: scraped.url,
+        title: scraped.title,
+        description: scraped.description,
+        image: scraped.image,
+        siteName: scraped.siteName,
+      }
+    : null;
+
+  const userMessage = buildUserMessage(body, scraped?.markdown);
 
   let draft: string;
   try {
@@ -29,6 +44,8 @@ export async function POST(request: NextRequest) {
     }
     throw err;
   }
+
+  draft = enforceHashtagsAboveLink(draft, body.link);
 
   await appendLogRow({
     timestamp: new Date().toISOString(),
@@ -41,5 +58,5 @@ export async function POST(request: NextRequest) {
     draft,
   });
 
-  return NextResponse.json({ draft });
+  return NextResponse.json({ draft, preview });
 }

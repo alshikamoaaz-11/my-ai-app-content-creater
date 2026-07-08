@@ -2,50 +2,28 @@
 
 import { useState } from "react";
 import { CATEGORIES, MECHANICS } from "@/lib/categories";
-
-type Status = "idle" | "loading" | "success" | "error";
+import LinkPreviewCard from "@/components/LinkPreviewCard";
+import { useWorkspace } from "@/components/WorkspaceProvider";
 
 const fieldLabel = "mb-1.5 block text-xs font-semibold tracking-wide text-anb-navy";
 const fieldClass = "anb-field w-full rounded-xl px-3.5 py-2.5 text-sm text-anb-ink";
 
 export default function DraftForm() {
-  const [category, setCategory] = useState(CATEGORIES[0].value);
-  const [partner, setPartner] = useState("");
-  const [mechanic, setMechanic] = useState(MECHANICS[0].value);
-  const [detail, setDetail] = useState("");
-  const [link, setLink] = useState("");
-
-  const [draft, setDraft] = useState("");
-  const [status, setStatus] = useState<Status>("idle");
-  const [error, setError] = useState<string | null>(null);
+  const {
+    form,
+    setFormField,
+    draft,
+    preview,
+    status,
+    error,
+    generateForm,
+  } = useWorkspace();
   const [copied, setCopied] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setStatus("loading");
-    setError(null);
     setCopied(false);
-
-    try {
-      const res = await fetch("/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ category, partner, mechanic, detail, link }),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        setStatus("error");
-        setError(data.error || "حدث خطأ أثناء إنشاء المسودة");
-        return;
-      }
-
-      setDraft(data.draft);
-      setStatus("success");
-    } catch {
-      setStatus("error");
-      setError("تعذّر الاتصال بالخادم، حاول مرة أخرى");
-    }
+    await generateForm();
   }
 
   async function handleCopy() {
@@ -61,8 +39,8 @@ export default function DraftForm() {
         <div>
           <label className={fieldLabel}>الفئة</label>
           <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            value={form.category}
+            onChange={(e) => setFormField("category", e.target.value)}
             className={fieldClass}
           >
             {CATEGORIES.map((c) => (
@@ -80,8 +58,8 @@ export default function DraftForm() {
           </label>
           <input
             type="text"
-            value={partner}
-            onChange={(e) => setPartner(e.target.value)}
+            value={form.partner}
+            onChange={(e) => setFormField("partner", e.target.value)}
             placeholder='مثال: "نون"'
             className={fieldClass}
           />
@@ -90,8 +68,8 @@ export default function DraftForm() {
         <div>
           <label className={fieldLabel}>آلية المكافأة</label>
           <select
-            value={mechanic}
-            onChange={(e) => setMechanic(e.target.value)}
+            value={form.mechanic}
+            onChange={(e) => setFormField("mechanic", e.target.value)}
             className={fieldClass}
           >
             {MECHANICS.map((m) => (
@@ -106,8 +84,8 @@ export default function DraftForm() {
           <label className={fieldLabel}>نسبة الخصم / التفاصيل</label>
           <input
             type="text"
-            value={detail}
-            onChange={(e) => setDetail(e.target.value)}
+            value={form.detail}
+            onChange={(e) => setFormField("detail", e.target.value)}
             placeholder="مثال: خصم 20% أو استرداد نقدي 5%"
             className={fieldClass}
           />
@@ -120,8 +98,8 @@ export default function DraftForm() {
           </label>
           <input
             type="text"
-            value={link}
-            onChange={(e) => setLink(e.target.value)}
+            value={form.link}
+            onChange={(e) => setFormField("link", e.target.value)}
             placeholder="https://..."
             className={fieldClass}
           />
@@ -162,6 +140,8 @@ export default function DraftForm() {
           dir="rtl"
           className="min-h-[220px] flex-1 resize-none rounded-xl border border-anb-line bg-anb-blue-pale/30 p-4 text-sm leading-7 text-anb-navy-dark focus:outline-none"
         />
+
+        {status === "success" && <LinkPreviewCard preview={preview} />}
 
         <button
           type="button"
