@@ -11,7 +11,12 @@ export type FormInputs = {
 };
 
 /** One labelled variant produced by the bulk-campaign workspace. */
-export type CampaignDraft = { label: string; draft: string };
+export type CampaignDraft = {
+  label: string;
+  draft: string;
+  mandatoryHashtags: string[];
+  suggestedHashtags: string[];
+};
 
 export type HistoryItem = {
   id: string;
@@ -24,6 +29,7 @@ export type HistoryItem = {
   url?: string;
   draft: string;
   preview: LinkPreview | null;
+  suggestedHashtags: string[];
 };
 
 /** Active, in-progress workspace snapshot (restored on refresh / tab switch). */
@@ -35,6 +41,7 @@ export type WorkspaceSnapshot = {
   campaignDrafts: CampaignDraft[];
   draft: string;
   preview: LinkPreview | null;
+  suggestedHashtags: string[];
 };
 
 export const WORKSPACE_KEY = "anb.workspace.v1";

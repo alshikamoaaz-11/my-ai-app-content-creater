@@ -6,7 +6,8 @@ import { generateDraft, GenerationError } from "@/lib/anthropic";
 import { appendLogRow } from "@/lib/sheets";
 import { findCategory, findMechanic } from "@/lib/categories";
 import { scrapeUrl } from "@/lib/scrape";
-import { enforceHashtagsAboveLink } from "@/lib/format";
+import { retrieveCategoryExamples } from "@/lib/retrieval";
+import { MANDATORY_HASHTAGS, sanitizeSuggestedHashtags } from "@/lib/hashtags";
 
 export async function POST(request: NextRequest) {
   const cookieStore = await cookies();
@@ -33,19 +34,26 @@ export async function POST(request: NextRequest) {
       }
     : null;
 
-  const userMessage = buildUserMessage(body, scraped?.markdown);
+  // Ground the draft in real anb tweets from the same category (top engagement
+  // + hashtag/recency matches). Falls back to hardcoded examples if empty.
+  const { merged: examples } = await retrieveCategoryExamples(body.category, {
+    queryText: `${body.partner ?? ""} ${body.detail ?? ""}`,
+  });
+
+  const userMessage = buildUserMessage(body, scraped?.markdown, examples);
 
   let draft: string;
+  let suggestedHashtags: string[];
   try {
-    draft = await generateDraft(SYSTEM_PROMPT, userMessage);
+    const result = await generateDraft(SYSTEM_PROMPT, userMessage);
+    draft = result.draft;
+    suggestedHashtags = sanitizeSuggestedHashtags(result.suggestedHashtags);
   } catch (err) {
     if (err instanceof GenerationError) {
       return NextResponse.json({ error: err.message }, { status: 502 });
     }
     throw err;
   }
-
-  draft = enforceHashtagsAboveLink(draft, body.link);
 
   await appendLogRow({
     timestamp: new Date().toISOString(),
@@ -58,5 +66,10 @@ export async function POST(request: NextRequest) {
     draft,
   });
 
-  return NextResponse.json({ draft, preview });
+  return NextResponse.json({
+    draft,
+    preview,
+    mandatoryHashtags: MANDATORY_HASHTAGS,
+    suggestedHashtags,
+  });
 }
