@@ -1,6 +1,6 @@
 import type { LinkPreview } from "@/lib/scrape";
 
-export type WorkspaceMode = "form" | "chat";
+export type WorkspaceMode = "form" | "link" | "campaign";
 
 export type FormInputs = {
   category: string;
@@ -10,6 +10,9 @@ export type FormInputs = {
   link: string;
 };
 
+/** One labelled variant produced by the bulk-campaign workspace. */
+export type CampaignDraft = { label: string; draft: string };
+
 export type HistoryItem = {
   id: string;
   ts: number;
@@ -17,7 +20,8 @@ export type HistoryItem = {
   /** Short human label shown in the sidebar list. */
   title: string;
   form?: FormInputs;
-  topic?: string;
+  /** Source URL for the link→post workspace. */
+  url?: string;
   draft: string;
   preview: LinkPreview | null;
 };
@@ -26,7 +30,9 @@ export type HistoryItem = {
 export type WorkspaceSnapshot = {
   mode: WorkspaceMode;
   form: FormInputs;
-  topic: string;
+  url: string;
+  campaignBrief: string;
+  campaignDrafts: CampaignDraft[];
   draft: string;
   preview: LinkPreview | null;
 };

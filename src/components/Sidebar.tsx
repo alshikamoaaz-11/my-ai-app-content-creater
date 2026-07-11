@@ -51,7 +51,7 @@ export default function Sidebar({
     return history.filter((h) => h.title.includes(q) || h.draft.includes(q));
   }, [history, query]);
 
-  function go(next: "form" | "chat") {
+  function go(next: "form" | "link" | "campaign") {
     setMode(next);
     onNavigate?.();
   }
@@ -72,7 +72,7 @@ export default function Sidebar({
           anb
         </div>
         <div className="leading-tight">
-          <p className="text-sm font-bold text-anb-white">لوحة صياغة المحتوى</p>
+          <p className="text-sm font-bold text-anb-white">منصة صناعة المحتوى</p>
           <p className="text-[11px] text-anb-blue-light">فريق التسويق — X</p>
         </div>
       </div>
@@ -100,15 +100,21 @@ export default function Sidebar({
       <nav className="space-y-1.5 px-4 pb-2">
         <NavButton
           active={mode === "form"}
-          label="النموذج المنظم"
+          label="المولّد الذكي (قوالب جاهزة)"
           icon="🧾"
           onClick={() => go("form")}
         />
         <NavButton
-          active={mode === "chat"}
-          label="محادثة مُهَدّة"
-          icon="💬"
-          onClick={() => go("chat")}
+          active={mode === "link"}
+          label="تحويل الرابط إلى منشور"
+          icon="🔗"
+          onClick={() => go("link")}
+        />
+        <NavButton
+          active={mode === "campaign"}
+          label="توليد حملات مكثفة"
+          icon="📣"
+          onClick={() => go("campaign")}
         />
       </nav>
 
@@ -133,7 +139,7 @@ export default function Sidebar({
           {filtered.length === 0 ? (
             <p className="px-1 py-2 text-xs text-anb-white/40">
               {history.length === 0
-                ? "لا يوجد سجل بعد — أنشئ مسودة لتظهر هنا."
+                ? "السجل فارغ. المسودات الجديدة ستظهر هنا."
                 : "لا نتائج مطابقة للبحث."}
             </p>
           ) : (
@@ -154,7 +160,11 @@ export default function Sidebar({
                     {item.title}
                   </span>
                   <span className="text-[10px] text-anb-white/40">
-                    {item.mode === "form" ? "نموذج" : "محادثة"}
+                    {item.mode === "form"
+                      ? "نموذج"
+                      : item.mode === "link"
+                        ? "رابط"
+                        : "حملة"}
                   </span>
                 </button>
                 <button

@@ -18,6 +18,7 @@ import {
   makeId,
   saveJSON,
   WORKSPACE_KEY,
+  type CampaignDraft,
   type FormInputs,
   type HistoryItem,
   type WorkspaceMode,
@@ -41,8 +42,12 @@ type WorkspaceContextValue = {
   form: FormInputs;
   setFormField: (field: keyof FormInputs, value: string) => void;
 
-  topic: string;
-  setTopic: (value: string) => void;
+  url: string;
+  setUrl: (value: string) => void;
+
+  campaignBrief: string;
+  setCampaignBrief: (value: string) => void;
+  campaignDrafts: CampaignDraft[];
 
   draft: string;
   preview: LinkPreview | null;
@@ -51,7 +56,9 @@ type WorkspaceContextValue = {
 
   history: HistoryItem[];
   generateForm: () => Promise<void>;
-  generateChat: () => Promise<void>;
+  generateLink: () => Promise<void>;
+  generateCampaign: () => Promise<void>;
+  clearDraft: () => void;
   restore: (item: HistoryItem) => void;
   removeHistory: (id: string) => void;
   clearHistory: () => void;
@@ -72,7 +79,9 @@ export default function WorkspaceProvider({
 }) {
   const [mode, setMode] = useState<WorkspaceMode>("form");
   const [form, setForm] = useState<FormInputs>(DEFAULT_FORM);
-  const [topic, setTopic] = useState("");
+  const [url, setUrl] = useState("");
+  const [campaignBrief, setCampaignBrief] = useState("");
+  const [campaignDrafts, setCampaignDrafts] = useState<CampaignDraft[]>([]);
   const [draft, setDraft] = useState("");
   const [preview, setPreview] = useState<LinkPreview | null>(null);
   const [status, setStatus] = useState<Status>("idle");
@@ -87,10 +96,12 @@ export default function WorkspaceProvider({
     if (snap) {
       setMode(snap.mode ?? "form");
       setForm({ ...DEFAULT_FORM, ...(snap.form ?? {}) });
-      setTopic(snap.topic ?? "");
+      setUrl(snap.url ?? "");
+      setCampaignBrief(snap.campaignBrief ?? "");
+      setCampaignDrafts(snap.campaignDrafts ?? []);
       setDraft(snap.draft ?? "");
       setPreview(snap.preview ?? null);
-      if (snap.draft) setStatus("success");
+      if (snap.draft || (snap.campaignDrafts?.length ?? 0) > 0) setStatus("success");
     }
     setHistory(loadJSON<HistoryItem[]>(HISTORY_KEY, []));
     hydrated.current = true;
@@ -99,9 +110,17 @@ export default function WorkspaceProvider({
   // Persist the active workspace whenever it changes (after hydration).
   useEffect(() => {
     if (!hydrated.current) return;
-    const snapshot: WorkspaceSnapshot = { mode, form, topic, draft, preview };
+    const snapshot: WorkspaceSnapshot = {
+      mode,
+      form,
+      url,
+      campaignBrief,
+      campaignDrafts,
+      draft,
+      preview,
+    };
     saveJSON(WORKSPACE_KEY, snapshot);
-  }, [mode, form, topic, draft, preview]);
+  }, [mode, form, url, campaignBrief, campaignDrafts, draft, preview]);
 
   useEffect(() => {
     if (!hydrated.current) return;
@@ -150,14 +169,14 @@ export default function WorkspaceProvider({
     }
   }, [form, pushHistory]);
 
-  const generateChat = useCallback(async () => {
+  const generateLink = useCallback(async () => {
     setStatus("loading");
     setError(null);
     try {
-      const res = await fetch("/api/generate-chat", {
+      const res = await fetch("/api/generate-link", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic }),
+        body: JSON.stringify({ url }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -165,35 +184,69 @@ export default function WorkspaceProvider({
         setError(data.error || "حدث خطأ أثناء إنشاء المسودة");
         return;
       }
+      const nextPreview: LinkPreview | null = data.preview ?? null;
       setDraft(data.draft);
-      setPreview(null);
+      setPreview(nextPreview);
       setStatus("success");
       pushHistory({
         id: makeId(),
         ts: Date.now(),
-        mode: "chat",
+        mode: "link",
         title: deriveTitle(data.draft),
-        topic,
+        url,
         draft: data.draft,
-        preview: null,
+        preview: nextPreview,
       });
     } catch {
       setStatus("error");
       setError("تعذّر الاتصال بالخادم، حاول مرة أخرى");
     }
-  }, [topic, pushHistory]);
+  }, [url, pushHistory]);
+
+  const generateCampaign = useCallback(async () => {
+    setStatus("loading");
+    setError(null);
+    try {
+      const res = await fetch("/api/generate-campaign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ brief: campaignBrief }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setStatus("error");
+        setError(data.error || "حدث خطأ أثناء إنشاء المسودات");
+        return;
+      }
+      setCampaignDrafts(data.drafts ?? []);
+      setStatus("success");
+    } catch {
+      setStatus("error");
+      setError("تعذّر الاتصال بالخادم، حاول مرة أخرى");
+    }
+  }, [campaignBrief]);
 
   const restore = useCallback((item: HistoryItem) => {
     setMode(item.mode);
     if (item.mode === "form" && item.form) {
       setForm({ ...DEFAULT_FORM, ...item.form });
     }
-    if (item.mode === "chat") {
-      setTopic(item.topic ?? "");
+    if (item.mode === "link") {
+      setUrl(item.url ?? "");
     }
     setDraft(item.draft);
     setPreview(item.preview);
     setStatus("success");
+    setError(null);
+  }, []);
+
+  // Clears all generated output (single draft, its preview, campaign drafts) and
+  // resets generation status. History and input fields are left untouched.
+  const clearDraft = useCallback(() => {
+    setDraft("");
+    setPreview(null);
+    setCampaignDrafts([]);
+    setStatus("idle");
     setError(null);
   }, []);
 
@@ -208,15 +261,20 @@ export default function WorkspaceProvider({
     setMode,
     form,
     setFormField,
-    topic,
-    setTopic,
+    url,
+    setUrl,
+    campaignBrief,
+    setCampaignBrief,
+    campaignDrafts,
     draft,
     preview,
     status,
     error,
     history,
     generateForm,
-    generateChat,
+    generateLink,
+    generateCampaign,
+    clearDraft,
     restore,
     removeHistory,
     clearHistory,

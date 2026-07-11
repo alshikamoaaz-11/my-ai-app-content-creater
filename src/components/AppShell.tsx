@@ -3,19 +3,30 @@
 import { useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import DraftForm from "@/components/DraftForm";
-import ChatForm from "@/components/ChatForm";
+import LinkForm from "@/components/LinkForm";
+import CampaignForm from "@/components/CampaignForm";
 import { useWorkspace } from "@/components/WorkspaceProvider";
+
+const HEADINGS: Record<string, { heading: string; subheading: string }> = {
+  form: {
+    heading: "المولّد الذكي (قوالب جاهزة)",
+    subheading: "املأ الحقول، وسيصوغ المساعد مسودة تغريدة مطابقة لأسلوب anb.",
+  },
+  link: {
+    heading: "تحويل الرابط إلى منشور",
+    subheading: "الصق رابطًا، ونحوّل عنوان الصفحة وصورتها إلى منشور بأسلوب anb.",
+  },
+  campaign: {
+    heading: "توليد حملات مكثفة",
+    subheading: "اكتب موجز الحملة، واحصل على ٣ نسخ مختلفة دفعة واحدة.",
+  },
+};
 
 export default function AppShell({ displayName }: { displayName?: string }) {
   const { mode } = useWorkspace();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const heading =
-    mode === "form" ? "النموذج المنظم" : "محادثة مُهَدّة";
-  const subheading =
-    mode === "form"
-      ? "املأ الحقول، وسيصوغ المساعد مسودة تغريدة مطابقة لأسلوب anb."
-      : "اكتب موضوعك بحرية، وسيختار المساعد القالب المناسب تلقائيًا.";
+  const { heading, subheading } = HEADINGS[mode] ?? HEADINGS.form;
 
   return (
     <div className="flex min-h-full flex-1">
@@ -52,7 +63,7 @@ export default function AppShell({ displayName }: { displayName?: string }) {
           >
             ☰
           </button>
-          <span className="text-sm font-bold text-anb-navy">لوحة صياغة المحتوى</span>
+          <span className="text-sm font-bold text-anb-navy">منصة صناعة المحتوى</span>
         </div>
 
         <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 lg:py-10">
@@ -64,7 +75,9 @@ export default function AppShell({ displayName }: { displayName?: string }) {
             <p className="mt-1.5 text-sm text-slate-500">{subheading}</p>
           </div>
 
-          {mode === "form" ? <DraftForm /> : <ChatForm />}
+          {mode === "form" && <DraftForm />}
+          {mode === "link" && <LinkForm />}
+          {mode === "campaign" && <CampaignForm />}
         </main>
 
         <footer className="border-t border-anb-line py-5 text-center text-xs text-slate-400">
