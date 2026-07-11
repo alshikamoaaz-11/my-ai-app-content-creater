@@ -4,6 +4,7 @@ import { useState } from "react";
 import ActionButton from "@/components/ActionButton";
 import XPostPreview from "@/components/XPostPreview";
 import HashtagChips from "@/components/HashtagChips";
+import CompliancePanel from "@/components/CompliancePanel";
 import { useWorkspace } from "@/components/WorkspaceProvider";
 
 function VersionCard({
@@ -62,6 +63,7 @@ function VersionCard({
           <XPostPreview draft={draft} preview={null} />
           <HashtagChips title="الهاشتاقات الإلزامية" hashtags={mandatoryHashtags} />
           <HashtagChips title="الهاشتاقات المقترحة" hashtags={suggestedHashtags} />
+          <CompliancePanel draft={draft} workspace="campaign" />
         </>
       )}
     </div>

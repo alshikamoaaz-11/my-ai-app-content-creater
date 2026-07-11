@@ -5,6 +5,7 @@ import { CATEGORIES, MECHANICS } from "@/lib/categories";
 import ActionButton from "@/components/ActionButton";
 import XPostPreview from "@/components/XPostPreview";
 import HashtagChips from "@/components/HashtagChips";
+import CompliancePanel from "@/components/CompliancePanel";
 import { useWorkspace } from "@/components/WorkspaceProvider";
 
 const fieldLabel = "mb-1.5 block text-xs font-semibold tracking-wide text-anb-navy";
@@ -212,6 +213,7 @@ export default function DraftForm() {
               title="الهاشتاقات المقترحة"
               hashtags={suggestedHashtags}
             />
+            <CompliancePanel draft={draft} workspace="form" />
           </>
         )}
       </div>
