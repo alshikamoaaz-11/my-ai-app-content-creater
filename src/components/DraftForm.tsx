@@ -7,9 +7,16 @@ import XPostPreview from "@/components/XPostPreview";
 import HashtagChips from "@/components/HashtagChips";
 import CompliancePanel from "@/components/CompliancePanel";
 import { useWorkspace } from "@/components/WorkspaceProvider";
+import {
+  IconCheck,
+  IconCopy,
+  IconRefresh,
+  IconSpinner,
+  IconTrash,
+} from "@/components/icons";
 
 const fieldLabel = "mb-1.5 block text-xs font-semibold tracking-wide text-anb-navy";
-const fieldClass = "anb-field w-full rounded-xl px-3.5 py-2.5 text-sm text-anb-ink";
+const fieldClass = "anb-field w-full rounded-lg px-3.5 py-2.5 text-sm text-anb-ink";
 
 /** Greeting category: swap the reward/discount fields for a single occasion field. */
 const HOLIDAY_CATEGORY = "holiday_greeting";
@@ -65,8 +72,8 @@ export default function DraftForm() {
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <form onSubmit={handleSubmit} className="anb-card space-y-4 p-6 sm:p-7">
+    <div className="grid gap-8 lg:grid-cols-2">
+      <form onSubmit={handleSubmit} className="anb-card space-y-5 p-7 sm:p-8">
         <div>
           <label className={fieldLabel}>الفئة</label>
           <select
@@ -154,14 +161,21 @@ export default function DraftForm() {
         <button
           type="submit"
           disabled={status === "loading"}
-          className="anb-btn-primary w-full rounded-xl px-4 py-3 text-sm font-semibold text-anb-white disabled:opacity-60"
+          className="anb-btn-primary w-full rounded-lg px-4 py-3 text-sm font-semibold text-anb-white disabled:opacity-60"
         >
-          {status === "loading" ? "جاري الإنشاء..." : "إنشاء المسودة"}
+          {status === "loading" ? (
+            <span className="inline-flex items-center justify-center gap-2">
+              <IconSpinner />
+              جاري الإنشاء...
+            </span>
+          ) : (
+            "إنشاء المسودة"
+          )}
         </button>
       </form>
 
-      <div className="anb-card flex flex-col p-6 sm:p-7">
-        <div className="mb-4 flex items-center justify-between gap-3">
+      <div className="anb-card flex flex-col p-7 sm:p-8">
+        <div className="mb-6 flex items-center justify-between gap-3">
           <h2 className="text-sm font-bold tracking-wide text-anb-navy">
             المسودة
           </h2>
@@ -174,19 +188,19 @@ export default function DraftForm() {
             )}
             <div className="flex items-center gap-1.5">
               <ActionButton
-                icon={copied ? "✅" : "📋"}
+                icon={copied ? <IconCheck /> : <IconCopy />}
                 label="نسخ المسودة"
                 onClick={handleCopy}
                 disabled={!draft}
               />
               <ActionButton
-                icon="🔄"
+                icon={<IconRefresh />}
                 label="إعادة التوليد"
                 onClick={handleRegenerate}
                 disabled={status === "loading"}
               />
               <ActionButton
-                icon="🗑"
+                icon={<IconTrash />}
                 label="مسح المسودة"
                 onClick={handleClear}
                 disabled={status === "loading" || (!draft && !preview && !error)}

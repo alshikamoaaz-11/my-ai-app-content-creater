@@ -62,9 +62,10 @@ export default function LoginPage() {
             <div className="anb-navy-surface mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl text-lg font-extrabold tracking-wide text-anb-white shadow-lg">
               anb
             </div>
-            <h1 className="text-xl font-bold text-anb-navy">
-              لوحة صياغة المحتوى
-            </h1>
+            <h1 className="text-xl font-bold text-anb-navy">Haya Plus</h1>
+            <p className="mt-1 text-sm font-semibold text-anb-navy/70">
+              منصة صناعة المحتوى
+            </p>
             <p className="mt-1.5 text-sm text-slate-500">
               سجّل الدخول للمتابعة إلى مساحة العمل
             </p>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Tajawal } from "next/font/google";
+import { apercuVariable } from "@/fonts/apercu.generated";
 import "./globals.css";
 
 const tajawal = Tajawal({
@@ -9,8 +10,8 @@ const tajawal = Tajawal({
 });
 
 export const metadata: Metadata = {
-  title: "لوحة صياغة محتوى anb",
-  description: "أداة داخلية لفريق التسويق لصياغة تغريدات على أسلوب anb",
+  title: "Haya Plus | منصة صناعة المحتوى",
+  description: "منصة داخلية لفريق التسويق لصياغة تغريدات مطابقة لأسلوب anb",
 };
 
 export default function RootLayout({
@@ -22,7 +23,7 @@ export default function RootLayout({
     <html
       lang="ar"
       dir="rtl"
-      className={`${tajawal.variable} h-full antialiased`}
+      className={`${apercuVariable} ${tajawal.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         {children}

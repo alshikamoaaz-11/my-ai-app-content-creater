@@ -123,6 +123,20 @@ async function scrapeViaFetch(u: URL): Promise<ScrapeResult | null> {
 }
 
 /**
+ * Fetch ONLY Open Graph metadata (title + image, plus description/siteName),
+ * never article text and never the Crawl4AI service. Used by the link→post
+ * workspace, which must not crawl or summarise full page content.
+ */
+export async function fetchOgMeta(rawUrl: string): Promise<LinkPreview | null> {
+  const u = isHttpUrl(rawUrl.trim());
+  if (!u) return null;
+  const result = await scrapeViaFetch(u);
+  if (!result) return null;
+  const { markdown: _markdown, ...meta } = result;
+  return meta;
+}
+
+/**
  * Scrape a URL, preferring Crawl4AI, falling back to fetch+OG parsing.
  * Returns null only for an invalid URL or when both paths fail.
  */

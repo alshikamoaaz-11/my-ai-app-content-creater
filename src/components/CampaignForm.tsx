@@ -6,6 +6,14 @@ import XPostPreview from "@/components/XPostPreview";
 import HashtagChips from "@/components/HashtagChips";
 import CompliancePanel from "@/components/CompliancePanel";
 import { useWorkspace } from "@/components/WorkspaceProvider";
+import {
+  IconCheck,
+  IconCopy,
+  IconMegaphone,
+  IconRefresh,
+  IconSpinner,
+  IconTrash,
+} from "@/components/icons";
 
 function VersionCard({
   label,
@@ -34,20 +42,20 @@ function VersionCard({
   }
 
   return (
-    <div className="anb-card p-5">
-      <div className="mb-3 flex items-center justify-between">
-        <span className="inline-flex items-center gap-2 rounded-full bg-anb-navy px-3 py-1 text-xs font-bold text-anb-white">
+    <div className="anb-card anb-fade-in p-6 sm:p-7">
+      <div className="mb-5 flex items-center justify-between">
+        <span className="inline-flex items-center gap-2 rounded-full border border-anb-line bg-slate-50 px-3 py-1 text-xs font-bold text-anb-navy">
           النسخة {label}
         </span>
         <div className="flex items-center gap-1.5">
           <ActionButton
-            icon={copied ? "✅" : "📋"}
+            icon={copied ? <IconCheck /> : <IconCopy />}
             label={`نسخ النسخة ${label}`}
             onClick={handleCopy}
             disabled={!draft || isRegenerating}
           />
           <ActionButton
-            icon="🔄"
+            icon={<IconRefresh />}
             label={`إعادة توليد النسخة ${label}`}
             onClick={onRegenerate}
             disabled={disabled || isRegenerating}
@@ -55,7 +63,8 @@ function VersionCard({
         </div>
       </div>
       {isRegenerating ? (
-        <div className="flex min-h-[220px] flex-1 items-center justify-center rounded-2xl border border-dashed border-anb-line bg-anb-blue-pale/20 p-6 text-center text-sm text-slate-400">
+        <div className="flex min-h-[220px] flex-1 items-center justify-center gap-2 rounded-xl border border-dashed border-anb-line bg-slate-50/60 p-6 text-center text-sm text-slate-400">
+          <IconSpinner />
           جاري إعادة التوليد...
         </div>
       ) : (
@@ -113,8 +122,8 @@ export default function CampaignForm() {
   const isBusy = status === "loading" || regeneratingCampaignLabels.length > 0;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <form onSubmit={handleSubmit} className="anb-card space-y-4 p-6 sm:p-7">
+    <div className="grid gap-8 lg:grid-cols-2">
+      <form onSubmit={handleSubmit} className="anb-card space-y-5 p-7 sm:p-8">
         <div>
           <label className="mb-1.5 block text-xs font-semibold tracking-wide text-anb-navy">
             موجز الحملة
@@ -129,21 +138,28 @@ export default function CampaignForm() {
             rows={8}
             dir="rtl"
             placeholder="مثال: حملة استرداد نقدي على المطاعم لعملاء بطاقات anb الائتمانية خلال رمضان..."
-            className="anb-field w-full resize-none rounded-xl px-3.5 py-2.5 text-sm leading-7 text-anb-ink"
+            className="anb-field w-full resize-none rounded-lg px-3.5 py-2.5 text-sm leading-7 text-anb-ink"
           />
         </div>
 
         <button
           type="submit"
           disabled={status === "loading" || !campaignBrief.trim()}
-          className="anb-btn-primary w-full rounded-xl px-4 py-3 text-sm font-semibold text-anb-white disabled:opacity-60"
+          className="anb-btn-primary w-full rounded-lg px-4 py-3 text-sm font-semibold text-anb-white disabled:opacity-60"
         >
-          {status === "loading" ? "جاري توليد ٣ نسخ..." : "ولّد ٣ نسخ"}
+          {status === "loading" ? (
+            <span className="inline-flex items-center justify-center gap-2">
+              <IconSpinner />
+              جاري توليد ٣ نسخ...
+            </span>
+          ) : (
+            "ولّد ٣ نسخ"
+          )}
         </button>
       </form>
 
-      <div className="space-y-5">
-        <div className="anb-card p-5 sm:p-6">
+      <div className="space-y-6">
+        <div className="anb-card p-6 sm:p-7">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-sm font-bold tracking-wide text-anb-navy">
               النسخ الثلاث
@@ -157,19 +173,19 @@ export default function CampaignForm() {
               )}
               <div className="flex items-center gap-1.5">
                 <ActionButton
-                  icon={copiedAll ? "✅" : "📋"}
+                  icon={copiedAll ? <IconCheck /> : <IconCopy />}
                   label="نسخ جميع النسخ"
                   onClick={handleCopyAll}
                   disabled={!hasDrafts || isBusy}
                 />
                 <ActionButton
-                  icon="🔄"
+                  icon={<IconRefresh />}
                   label="إعادة توليد الكل"
                   onClick={handleRegenerateAll}
                   disabled={isBusy || !campaignBrief.trim()}
                 />
                 <ActionButton
-                  icon="🗑"
+                  icon={<IconTrash />}
                   label="مسح جميع النسخ"
                   onClick={handleClearAll}
                   disabled={isBusy || !hasDrafts}
@@ -186,8 +202,11 @@ export default function CampaignForm() {
         </div>
 
         {!hasDrafts ? (
-          <div className="anb-card flex min-h-[220px] items-center justify-center p-6 text-center text-sm text-slate-400">
-            ستظهر النسخ الثلاث (أ، ب، ج) هنا بعد التوليد...
+          <div className="anb-card flex min-h-[220px] flex-col items-center justify-center gap-3 p-6 text-center">
+            <IconMegaphone className="h-6 w-6 text-slate-300" />
+            <p className="text-sm text-slate-400">
+              ستظهر النسخ الثلاث (أ، ب، ج) هنا بعد التوليد...
+            </p>
           </div>
         ) : (
           campaignDrafts.map((d) => (

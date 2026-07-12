@@ -6,6 +6,7 @@ import DraftForm from "@/components/DraftForm";
 import LinkForm from "@/components/LinkForm";
 import CampaignForm from "@/components/CampaignForm";
 import { useWorkspace } from "@/components/WorkspaceProvider";
+import { IconMenu } from "@/components/icons";
 
 const HEADINGS: Record<string, { heading: string; subheading: string }> = {
   form: {
@@ -39,7 +40,7 @@ export default function AppShell({ displayName }: { displayName?: string }) {
       {drawerOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div
-            className="absolute inset-0 bg-anb-navy-dark/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-anb-ink/25 backdrop-blur-sm"
             onClick={() => setDrawerOpen(false)}
           />
           <div className="absolute inset-y-0 right-0 w-72 max-w-[85%] shadow-2xl">
@@ -59,20 +60,22 @@ export default function AppShell({ displayName }: { displayName?: string }) {
             type="button"
             onClick={() => setDrawerOpen(true)}
             aria-label="فتح القائمة"
-            className="rounded-lg border border-anb-line px-3 py-1.5 text-sm text-anb-navy"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-anb-line text-anb-navy transition-colors hover:bg-slate-50"
           >
-            ☰
+            <IconMenu />
           </button>
-          <span className="text-sm font-bold text-anb-navy">منصة صناعة المحتوى</span>
+          <span className="text-sm font-bold text-anb-navy">Haya Plus</span>
         </div>
 
-        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 lg:py-10">
-          <div className="mb-8">
-            <span className="mb-2 inline-block text-xs font-semibold uppercase tracking-widest text-anb-gold">
+        <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-12 sm:px-10 lg:py-16">
+          <div className="mb-12">
+            <span className="mb-3 inline-block text-xs font-semibold uppercase tracking-widest text-slate-400">
               مساحة العمل
             </span>
-            <h2 className="text-2xl font-bold text-anb-navy">{heading}</h2>
-            <p className="mt-1.5 text-sm text-slate-500">{subheading}</p>
+            <h2 className="text-3xl font-bold tracking-tight text-anb-navy">
+              {heading}
+            </h2>
+            <p className="mt-2.5 text-sm leading-6 text-slate-500">{subheading}</p>
           </div>
 
           {mode === "form" && <DraftForm />}
@@ -80,7 +83,7 @@ export default function AppShell({ displayName }: { displayName?: string }) {
           {mode === "campaign" && <CampaignForm />}
         </main>
 
-        <footer className="border-t border-anb-line py-5 text-center text-xs text-slate-400">
+        <footer className="border-t border-anb-line py-8 text-center text-xs text-slate-400">
           أداة داخلية — لا يوجد نشر تلقائي على أي منصة
         </footer>
       </div>

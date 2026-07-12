@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import ActionButton from "@/components/ActionButton";
+import { IconCheck, IconCopy } from "@/components/icons";
 
 /**
  * Chip list for a group of hashtags (mandatory or AI-suggested), with copy
@@ -37,18 +38,18 @@ export default function HashtagChips({
   }
 
   return (
-    <div className="mt-4 border-t border-anb-line pt-4">
-      <div className="mb-2 flex items-center justify-between gap-2">
+    <div className="mt-6 border-t border-anb-line pt-5">
+      <div className="mb-3 flex items-center justify-between gap-2">
         <span className="text-xs font-semibold tracking-wide text-anb-navy">
           {title}
         </span>
         <ActionButton
-          icon={copiedAll ? "✅" : "📋"}
+          icon={copiedAll ? <IconCheck /> : <IconCopy />}
           label={`نسخ الكل — ${title}`}
           onClick={handleCopyAll}
         />
       </div>
-      <div dir="rtl" className="flex flex-wrap gap-1.5">
+      <div dir="rtl" className="flex flex-wrap gap-2">
         {hashtags.map((tag) => (
           <button
             key={tag}
@@ -58,9 +59,9 @@ export default function HashtagChips({
               handleCopyOne(tag);
             }}
             title="نسخ الهاشتاق"
-            className="inline-flex items-center gap-1 rounded-full bg-anb-blue-pale px-3 py-1 text-xs font-semibold text-anb-blue transition hover:bg-anb-blue/10"
+            className="inline-flex items-center gap-1 rounded-full bg-anb-blue-pale px-3 py-1 text-xs font-semibold text-anb-blue transition-colors hover:bg-anb-blue/10"
           >
-            {copiedTag === tag ? "✅" : tag}
+            {copiedTag === tag ? <IconCheck className="h-3.5 w-3.5" /> : tag}
           </button>
         ))}
       </div>
