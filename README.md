@@ -1,4 +1,4 @@
-# anb Content Drafting Dashboard
+# Content Drafting Dashboard
 
 Internal tool for anb's marketing team (3 named users) to generate on-brand
 Arabic X/Twitter post drafts using Claude — either via a structured form or
